@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace QuickMed.Models
 {
+
+    public enum UserType { Patient, Doctor }
+
     public class User
     {
         [Key]
@@ -18,6 +21,10 @@ namespace QuickMed.Models
         [EmailAddress]
         public string Email { get; set; }
 
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
         [Required]
         public string PasswordHash { get; set; }
 
@@ -25,5 +32,11 @@ namespace QuickMed.Models
 
         public List<Reservation> Reservations { get; set; } = new();
 
+        // Only applies if user is doctor
+        public string? Specialty { get; set; }
+        public string? LicenseNumber { get; set; }
+        public bool? IsVerified { get; set; } = false;
+
     }
+
 }
