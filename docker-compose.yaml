@@ -1,0 +1,54 @@
+version "3.9"
+
+
+services:
+  
+  postgres:
+    image:
+    environment:
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_DB: devdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+
+
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+
+
+
+  app:
+    image: alpine:latest  # temporal hasta armar Dockerfile
+    command: tail -f /dev/null  # Mantener el contenedor corriendo
+    depends_on:
+      - postgres
+      - redis
+      - mailhog
+    ports:
+      - "5000:5000"  # puede cambiar
+
+volumes:
+  pgdata:

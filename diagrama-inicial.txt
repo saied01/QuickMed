@@ -1,0 +1,39 @@
+             ┌─────────────────────┐
+             │      Frontend       │
+             │ (React / Angular /  │
+             │  cualquier SPA)    │
+             └─────────┬──────────┘
+                       │ HTTP Requests / API
+                       ▼
+             ┌─────────────────────┐
+             │     Backend .NET    │
+             │  (ASP.NET Core)     │
+             ├─────────────────────┤
+             │ - Swashbuckle       │←────┐ (Documenta y prueba API)
+             │ - Hangfire          │────┘ (Jobs en segundo plano)
+             │ - MailKit           │────┐ (Envía emails)
+             │ - Identity          │────┘ (Usuarios & roles)
+             │ - EF Core           │────┐ (ORM)
+             └─────────┬───────────┘    │
+                       │                │
+                       ▼                │
+              ┌────────────────┐       │
+              │   PostgreSQL    │◀─────┘ (EF Core + Identity)
+              │  (postgres)     │
+              └────────────────┘
+                       ▲
+                       │
+                       │ pgAdmin (UI para DB)
+                       │
+              ┌────────────────┐
+              │     pgAdmin     │
+              └────────────────┘
+
+            ┌────────────────┐
+            │     Redis      │
+            │ (cache / jobs) │◀─────────┐ (Hangfire, sessions, cache)
+            └────────────────┘           │
+                                         │
+            ┌────────────────┐           │
+            │    Mailhog     │───────────┘ (MailKit envía emails de test)
+            └────────────────┘
