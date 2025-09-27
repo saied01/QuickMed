@@ -2,9 +2,9 @@ package user
 
 import (
 	"errors"
-	"net/mail"
 
-	"golang.org/x/crypto/bcrypt"
+	"quickmed/pkg/security"
+	"quickmed/pkg/validation"
 )
 
 type UserService struct {
@@ -16,18 +16,18 @@ func NewUserService(repo *UserRepository) *UserService {
 }
 
 func (r *UserService) RegisterUser(email string, name string, password string) error {
-	err := valid_mail(email)
+	err := validation.ValidMail(email)
 	if err != nil {
 		return err
 	}
 
 	if u, _ := r.repo.GetByEmail(email); u != nil {
-		return errors.New("Email already registered.")
+		return errors.New("email already registered")
 	}
 
 	// TODO: password validator
 
-	hash_pass, errhash := HashPassword(password)
+	hashPass, errhash := security.HashPassword(password)
 	if errhash != nil {
 		return errhash
 	}
@@ -35,26 +35,11 @@ func (r *UserService) RegisterUser(email string, name string, password string) e
 	u := &User{
 		Email:    email,
 		Name:     name,
-		Password: hash_pass,
+		Password: hashPass,
 	}
 	err2 := r.repo.Create(u)
 
 	return err2
-}
-
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
-func valid_mail(email string) error {
-	_, err := mail.ParseAddress(email)
-	return err
 }
 
 func (r *UserService) GetUserByID(id uint) (*User, error) {
@@ -62,8 +47,30 @@ func (r *UserService) GetUserByID(id uint) (*User, error) {
 	return user, err
 }
 
-func (r *UserService) UpdateUser(user *User) error {
-	return r.repo.Update(user)
+func (r *UserService) UpdateUser(id uint, updated *User) error {
+	// get user and update changed values
+	existing, err := r.repo.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	if updated.Email != "" && updated.Email != existing.Email {
+		return errors.New("email cannot be changed")
+	}
+
+	if updated.Name != "" && updated.Name != existing.Name {
+		existing.Name = updated.Name
+	}
+
+	if updated.Password != "" {
+		hash, err := security.HashPassword(updated.Password)
+		if err != nil {
+			return err
+		}
+		existing.Password = hash
+	}
+
+	return r.repo.Update(existing)
 }
 
 func (r *UserService) DeleteUser(user *User) error {
