@@ -6,27 +6,27 @@
                        │ HTTP Requests / API
                        ▼
              ┌─────────────────────┐
-             │     Backend .NET    │
-             │  (ASP.NET Core)     │
+             │     Backend Go      │
+             │                     │
              ├─────────────────────┤
-             │ - Swashbuckle       │←────┐ (Documenta y prueba API)
-             │ - Hangfire          │────┘ (Jobs en segundo plano)
+             │ - GORM              │←────┐ (Documenta y prueba API)
+             │ - Hangfire          │ ────┘ (Jobs en segundo plano)
              │ - MailKit           │────┐ (Envía emails)
              │ - Identity          │────┘ (Usuarios & roles)
              │ - EF Core           │────┐ (ORM)
              └─────────┬───────────┘    │
                        │                │
                        ▼                │
-              ┌────────────────┐       │
-              │   PostgreSQL    │◀─────┘ (EF Core + Identity)
-              │  (postgres)     │
-              └────────────────┘
+                ┌────────────────┐      │
+                │   PostgreSQL   │◀─────┘ 
+                │  (postgres)    │
+                └────────────────┘
                        ▲
                        │
                        │ pgAdmin (UI para DB)
                        │
               ┌────────────────┐
-              │     pgAdmin     │
+              │     pgAdmin    │
               └────────────────┘
 
             ┌────────────────┐
