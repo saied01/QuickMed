@@ -38,3 +38,12 @@ func (r *UserRepository) Delete(user *User) error {
 	result := r.db.Delete(user)
 	return result.Error
 }
+
+func (r *UserRepository) GetByEmail(email string) (*User, error) {
+	var user User
+	result := r.db.First(&user, email)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}

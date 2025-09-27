@@ -18,7 +18,7 @@ func main() {
 	}
 
 	// database to repository and services
-	// userRepo := user.NewRepository(database)
-	// userService := user.NewService(userRepo)
+	userRepo := user.NewUserRepository(database)
+	userService := user.NewUserService(userRepo)
 	// reservationRepo := reservation.NewRepository(database)
 }
