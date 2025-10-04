@@ -27,12 +27,6 @@ until sudo docker exec -e PGPASSWORD=$PG_PASSWORD $PG_CONTAINER_NAME psql -U $PG
   sleep 2
 done
 
-echo "PostgreSQL is ready!"
-#
-# echo "Starting Go server in background..."
-# cd backend
-# # go server en background, logs en server.log
-# nohup go run main.go >server.log 2>&1 &
-# cd ..
+echo "PostgreSQL ready"
 
 echo "Environment ready."
