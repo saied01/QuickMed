@@ -15,21 +15,21 @@ func NewUserService(repo *UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (r *UserService) RegisterUser(email string, name string, password string) error {
+func (r *UserService) RegisterUser(email string, name string, password string) (*User, error) {
 	err := validation.ValidMail(email)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if u, _ := r.repo.GetByEmail(email); u != nil {
-		return errors.New("email already registered")
+		return nil, errors.New("email already registered")
 	}
 
 	// TODO: password validator
 
 	hashPass, errhash := security.HashPassword(password)
 	if errhash != nil {
-		return errhash
+		return nil, errhash
 	}
 
 	u := &User{
@@ -39,7 +39,7 @@ func (r *UserService) RegisterUser(email string, name string, password string) e
 	}
 	err2 := r.repo.Create(u)
 
-	return err2
+	return u, err2
 }
 
 func (r *UserService) GetUserByID(id uint) (*User, error) {
@@ -73,6 +73,10 @@ func (r *UserService) UpdateUser(id uint, updated *User) error {
 	return r.repo.Update(existing)
 }
 
-func (r *UserService) DeleteUser(user *User) error {
-	return r.repo.Delete(user)
+func (s *UserService) DeleteUser(id uint) error {
+	user, err := s.repo.GetByID(id)
+	if err != nil {
+		return err
+	}
+	return s.repo.Delete(user)
 }

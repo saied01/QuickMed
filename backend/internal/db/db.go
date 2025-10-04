@@ -6,15 +6,22 @@ package db
 import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
 )
 
 func New() *gorm.DB {
-	dsn := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Argentina/Buenos-Aires"
+	dsn := "host=localhost user=devuser password=devpass dbname=devdb port=5432 sslmode=disable TimeZone=America/Argentina/Buenos_Aires"
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("error connecting to database.")
+		log.Fatalf("failed to initialize database, got error %v", err)
 	}
 
 	return db
+}
+
+func Truncate(db *gorm.DB, tableName string) {
+	if err := db.Exec("TRUNCATE TABLE " + tableName + " RESTART IDENTITY CASCADE").Error; err != nil {
+		log.Fatalf("failed to truncate table %s: %v", tableName, err)
+	}
 }

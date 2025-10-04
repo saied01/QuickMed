@@ -41,7 +41,7 @@ func (r *UserRepository) Delete(user *User) error {
 
 func (r *UserRepository) GetByEmail(email string) (*User, error) {
 	var user User
-	result := r.db.First(&user, email)
+	result := r.db.Where("email = ?", email).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}

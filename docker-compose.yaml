@@ -1,10 +1,8 @@
-version "3.9"
-
+# version: "3.9"
 
 services:
-  
   postgres:
-    image:
+    image: postgres:15
     environment:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass
@@ -23,32 +21,6 @@ services:
       - "8080:80"
     depends_on:
       - postgres
-
-
-
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
-
-
-  mailhog:
-    image: mailhog/mailhog
-    ports:
-      - "1025:1025"  # SMTP
-      - "8025:8025"  # Web UI
-
-
-
-  app:
-    image: alpine:latest  # temporal hasta armar Dockerfile
-    command: tail -f /dev/null  # Mantener el contenedor corriendo
-    depends_on:
-      - postgres
-      - redis
-      - mailhog
-    ports:
-      - "5000:5000"  # puede cambiar
 
 volumes:
   pgdata:

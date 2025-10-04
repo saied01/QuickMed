@@ -1,0 +1,25 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /users/:id                --> quickmed/internal/user.(*UserHandler).GetUser-fm (3 handlers)
+[GIN-debug] POST   /signup                   --> quickmed/internal/user.(*UserHandler).SignUp-fm (3 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :5000
+
+2025/10/04 15:25:29 [31;1m/home/saied/code/quick-med/backend/internal/user/repository.go:44 [35;1mERROR: column "test" does not exist (SQLSTATE 42703)
+[0m[33m[152.766ms] [34;1m[rows:0][0m SELECT * FROM "users" WHERE test@example.com ORDER BY "users"."id" LIMIT 1
+
+2025/10/04 15:25:30 [31;1m/home/saied/code/quick-med/backend/internal/user/repository.go:16 [35;1mERROR: duplicate key value violates unique constraint "idx_users_email" (SQLSTATE 23505)
+[0m[33m[118.196ms] [34;1m[rows:0][0m INSERT INTO "users" ("name","email","age","password","created_at","updated_at","activated_at","specialty","license_number","is_verified") VALUES ('Test','test@example.com',0,'$2a$14$2a4.oi07LJ7tr4qjV1oBAOaEfLMaL1KPArJxX3TLePqWUmy/EZdQm','2025-10-04 15:25:30.67','2025-10-04 15:25:30.67',NULL,NULL,NULL,NULL) RETURNING "id"
+[GIN] 2025/10/04 - 15:25:30 | 400 |  1.120517803s |             ::1 | POST     "/signup"
+
+2025/10/04 15:28:09 [31;1m/home/saied/code/quick-med/backend/internal/user/repository.go:44 [35;1mERROR: column "test" does not exist (SQLSTATE 42703)
+[0m[33m[3.982ms] [34;1m[rows:0][0m SELECT * FROM "users" WHERE test@example.com ORDER BY "users"."id" LIMIT 1
+
+2025/10/04 15:28:10 [31;1m/home/saied/code/quick-med/backend/internal/user/repository.go:16 [35;1mERROR: duplicate key value violates unique constraint "idx_users_email" (SQLSTATE 23505)
+[0m[33m[1.208ms] [34;1m[rows:0][0m INSERT INTO "users" ("name","email","age","password","created_at","updated_at","activated_at","specialty","license_number","is_verified") VALUES ('Test','test@example.com',0,'$2a$14$IU26eIy8uqSKsEvAMwhE8.b4PIVpM/AFfJA79INiHhUgrYbVzl27e','2025-10-04 15:28:10.311','2025-10-04 15:28:10.311',NULL,NULL,NULL,NULL) RETURNING "id"
+[GIN] 2025/10/04 - 15:28:10 | 400 |   805.78545ms |             ::1 | POST     "/signup"
