@@ -1,0 +1,12 @@
+{{ define "content" }}
+<div class="card p-4">
+  <h2>Perfil de Usuario</h2>
+  <p><strong>Nombre:</strong> {{ .User.Name }}</p>
+  <p><strong>Email:</strong> {{ .User.Email }}</p>
+
+  <button class="btn btn-danger" hx-delete="/users/{{ .User.ID }}" hx-target="#content"
+    hx-confirm="¿Seguro que querés borrar este usuario?">
+    Borrar cuenta
+  </button>
+</div>
+{{ end }}

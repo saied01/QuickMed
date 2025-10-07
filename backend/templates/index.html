@@ -1,0 +1,18 @@
+{{ define "content" }}
+<div class="card p-4 text-center">
+  <h2>Bienvenido a QuickMed</h2>
+  <p>Por favor, elige una opción:</p>
+
+  <div class="d-flex justify-content-center gap-3 mt-3">
+    <button class="btn btn-primary" hx-get="/signup" hx-target="#form-container">
+      Sign Up
+    </button>
+    <button class="btn btn-secondary" hx-get="/signup" hx-target="#form-container">
+      Sign In
+    </button>
+  </div>
+
+  <!-- Aquí se cargará el formulario seleccionado -->
+  <div id="form-container" class="mt-4"></div>
+</div>
+{{ end }}

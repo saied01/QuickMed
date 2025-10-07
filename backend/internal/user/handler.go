@@ -1,6 +1,7 @@
 package user
 
 import (
+	"html/template"
 	"net/http"
 	"strconv"
 
@@ -15,8 +16,8 @@ func NewUserHandler(service *UserService) *UserHandler {
 	return &UserHandler{service: service}
 }
 
-// GET /users/:id
-func (h *UserHandler) GetUser(c *gin.Context) {
+// GET api/users/:id
+func (h *UserHandler) GetUserJSON(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -32,27 +33,67 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// POST /signup
-func (h *UserHandler) SignUp(c *gin.Context) {
-	var req struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Age      uint8  `json:"age"`
-		Password string `json:"password"`
-	}
-
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// GET /users/:id
+func (h *UserHandler) GetUserPage(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.String(http.StatusBadRequest, "invalid id")
 		return
 	}
 
-	u, err := h.service.RegisterUser(req.Email, req.Name, req.Password)
+	user, err := h.service.GetUserByID(uint(id))
+	if err != nil {
+		c.String(http.StatusNotFound, "user not found")
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles(
+		"templates/layout.html",
+		"templates/user.html",
+	))
+	c.Status(http.StatusOK)
+	tmpl.ExecuteTemplate(c.Writer, "layout", gin.H{
+		"Title": "Perfil de Usuario",
+		"User":  user,
+	})
+}
+
+// GET /signup
+func (h *UserHandler) SignUpPage(c *gin.Context) {
+	tmpl := template.Must(template.ParseFiles(
+		"templates/layout.html",
+		"templates/signup.html",
+	))
+	c.Status(http.StatusOK)
+	tmpl.ExecuteTemplate(c.Writer, "layout", gin.H{"Title": "Registro"})
+}
+
+// POST /signup
+func (h *UserHandler) SignUp(c *gin.Context) {
+
+	name := c.PostForm("name")
+	email := c.PostForm("email")
+	// agestr := c.PostForm("age")
+	password := c.PostForm("password")
+
+	if name == "" || email == "" || password == "" {
+		c.String(http.StatusBadRequest, "Todos los campos son obligatorios")
+		return
+	}
+
+	// age, _ := strconv.ParseUint(agestr, 10, 8)
+
+	u, err := h.service.RegisterUser(email, name, password)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, u)
+	tmpl := template.Must(template.ParseFiles(
+		"templates/user.html",
+	))
+	tmpl.ExecuteTemplate(c.Writer, "content", gin.H{"User": u})
 }
 
 // DELETE /user/:id

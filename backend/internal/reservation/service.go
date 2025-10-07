@@ -1,5 +1,10 @@
 package reservation
 
+import (
+	"errors"
+	"time"
+)
+
 type ReservationService struct {
 	repo *ReservationRepository
 }
@@ -18,8 +23,23 @@ func NewReservationService(rep *ReservationRepository) *ReservationService {
 //
 // Devuelve ErrConflict si hay solapamiento.
 
-// func (s *ReservationService) Reserve(userID, resourceID uint, start, end time.Time) (*Reservation, error) {
-// }
+func (s *ReservationService) Reserve(userID, resourceID uint, start time.Time, end time.Time) (*Reservation, error) {
+	if start.Compare(end) != -1 || start.Compare(time.Now()) != +1 {
+		return nil, errors.New("invalid dates")
+	}
+
+	// TODO check valid resource
+
+	if ov, err := s.repo.CountOverlapping(resourceID, start, end); ov > 0 {
+		return nil, err
+	}
+
+	r := &Reservation{
+		//TODO
+	}
+
+	return r, nil
+}
 
 // Verifica permisos (propietario o rol admin).
 //

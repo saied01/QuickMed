@@ -4,6 +4,8 @@ import (
 	"quickmed/internal/db"
 	//"quickmed/internal/email"
 	//"quickmed/internal/reservation"
+	"html/template"
+	"net/http"
 	"quickmed/internal/user"
 
 	"github.com/gin-gonic/gin"
@@ -23,9 +25,25 @@ func main() {
 
 	r := gin.Default()
 
-	r.GET("/users/:id", userHandler.GetUser)
-	r.POST("/signup", userHandler.SignUp)
+	r.GET("/", func(c *gin.Context) {
+		tmpl := template.Must(template.ParseFiles(
+			"templates/layout.html",
+			"templates/index.html",
+		))
+		c.Status(http.StatusOK)
+		tmpl.ExecuteTemplate(c.Writer, "layout", gin.H{
+			"Title": "Inicio",
+		})
+	})
+
+	// API JSON
+	r.GET("/api/users/:id", userHandler.GetUserJSON)
 	r.DELETE("/users/:id", userHandler.DeleteUser)
+
+	// Web HTML (htmx)
+	r.GET("/users/:id", userHandler.GetUserPage)
+	r.POST("/signup", userHandler.SignUp)
+	r.GET("/signup", userHandler.SignUpPage)
 
 	r.Run(":8081")
 }
