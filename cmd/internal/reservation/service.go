@@ -23,7 +23,7 @@ func NewReservationService(rep *ReservationRepository) *ReservationService {
 //
 // Devuelve ErrConflict si hay solapamiento.
 
-func (s *ReservationService) Reserve(userID, resourceID uint, start time.Time, end time.Time) (*Reservation, error) {
+func (s *ReservationService) Create(userID, resourceID uint, start time.Time, end time.Time) (*Reservation, error) {
 	if start.Compare(end) != -1 || start.Compare(time.Now()) != +1 {
 		return nil, errors.New("invalid dates")
 	}
@@ -34,9 +34,9 @@ func (s *ReservationService) Reserve(userID, resourceID uint, start time.Time, e
 		return nil, err
 	}
 
-	r := &Reservation{
-		//TODO
-	}
+	gor := s.repo.BeginTx()
+
+	r := &Reservation{}
 
 	return r, nil
 }

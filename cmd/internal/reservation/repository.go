@@ -1,9 +1,8 @@
 package reservation
 
 import (
-	"time"
-
 	"gorm.io/gorm"
+	"time"
 )
 
 type ReservationRepository struct {
@@ -61,6 +60,12 @@ func (r *ReservationRepository) CountOverlapping(resourceID uint, start, end tim
 		Count(&count)
 
 	return count, result.Error
+}
+
+// TRANSACTIONS
+
+func (r *ReservationRepository) BeginTx() *gorm.DB {
+	return r.db.Begin()
 }
 
 // Optional: FindAvailableResources(from, to time.Time, capacity uint) ([]Resource, error)
