@@ -2,8 +2,8 @@ package main
 
 import (
 	"quickmed/internal/db"
+	"quickmed/internal/reservation"
 	//"quickmed/internal/email"
-	//"quickmed/internal/reservation"
 	"html/template"
 	"net/http"
 	"quickmed/internal/user"
@@ -16,12 +16,15 @@ func main() {
 	database := db.New()
 
 	db.Truncate(database, "users")
+	// db.Truncate(database, "reservations")
 
 	// database to repository and services
 	userRepo := user.NewUserRepository(database)
 	userService := user.NewUserService(userRepo)
-	userHandler := user.NewUserHandler(userService)
-	// reservationRepo := reservation.NewRepository(database)
+	reservationRepo := reservation.NewReservationRepository(database)
+	reservationService := reservation.NewReservationService(reservationRepo)
+	resHandler := reservation.NewReservationHandler(reservationService)
+	userHandler := user.NewUserHandler(userService, reservationService)
 
 	r := gin.Default()
 
@@ -44,6 +47,7 @@ func main() {
 	r.GET("/users/:id", userHandler.GetUserPage)
 	r.POST("/signup", userHandler.SignUp)
 	r.GET("/signup", userHandler.SignUpPage)
+	r.POST("/reservations", resHandler.CreateReservation)
 
 	r.Run(":8081")
 }

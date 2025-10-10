@@ -34,9 +34,35 @@ func (s *ReservationService) Create(userID, resourceID uint, start time.Time, en
 		return nil, err
 	}
 
-	gor := s.repo.BeginTx()
+	tx := s.repo.BeginTx()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	defer tx.Rollback()
 
-	r := &Reservation{}
+	ov, err := s.repo.CountOverlappingTx(tx, resourceID, start, end)
+	if err != nil {
+		return nil, err
+	}
+	if ov > 0 {
+		return nil, errors.New("overlapping conflict")
+	}
+
+	r := &Reservation{
+		UserID:            userID,
+		ResourceID:        resourceID,
+		StartTime:         start,
+		EndTime:           end,
+		CreatedAt:         time.Now(),
+		ReservationStatus: "booked",
+	}
+
+	if err := s.repo.CreateTx(tx, r); err != nil {
+		return nil, err
+	}
+	if t := tx.Commit(); t.Error != nil {
+		return nil, t.Error
+	}
 
 	return r, nil
 }
@@ -56,4 +82,6 @@ func (s *ReservationService) Create(userID, resourceID uint, start time.Time, en
 // func (s *ReservationService) GetAvailability(resourceID uint, from, to time.Time) ([]FreeSlot, error) {
 // }
 
-// TODO: func (s *ReservationService) ListUserReservations(userID uint, filters...) ([]Reservation, error) {}
+func (s *ReservationService) GetUserReservations(userID uint) ([]Reservation, error) {
+	return s.repo.FindByUserID(userID)
+}

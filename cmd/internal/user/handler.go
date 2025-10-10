@@ -1,19 +1,23 @@
 package user
 
 import (
+	"github.com/gin-gonic/gin"
 	"html/template"
 	"net/http"
+	"quickmed/internal/reservation"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
-	service *UserService
+	service            *UserService
+	reservationService *reservation.ReservationService
 }
 
-func NewUserHandler(service *UserService) *UserHandler {
-	return &UserHandler{service: service}
+func NewUserHandler(userService *UserService, reservationService *reservation.ReservationService) *UserHandler {
+	return &UserHandler{
+		service:            userService,
+		reservationService: reservationService,
+	}
 }
 
 // GET api/users/:id
@@ -47,6 +51,11 @@ func (h *UserHandler) GetUserPage(c *gin.Context) {
 		c.String(http.StatusNotFound, "user not found")
 		return
 	}
+	reservations, err := h.reservationService.GetUserReservations(uint(id))
+	if err != nil {
+		c.String(http.StatusInternalServerError, "error loading reservations")
+		return
+	}
 
 	tmpl := template.Must(template.ParseFiles(
 		"templates/layout.html",
@@ -54,8 +63,9 @@ func (h *UserHandler) GetUserPage(c *gin.Context) {
 	))
 	c.Status(http.StatusOK)
 	tmpl.ExecuteTemplate(c.Writer, "layout", gin.H{
-		"Title": "Perfil de Usuario",
-		"User":  user,
+		"Title":        "Perfil de Usuario",
+		"User":         user,
+		"Reservations": reservations,
 	})
 }
 

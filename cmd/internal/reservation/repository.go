@@ -62,10 +62,34 @@ func (r *ReservationRepository) CountOverlapping(resourceID uint, start, end tim
 	return count, result.Error
 }
 
+func (r *ReservationRepository) FindByUserID(userID uint) ([]Reservation, error) {
+	var reservations []Reservation
+	result := r.db.
+		Preload("Resource").
+		Where("user_id = ?", userID).
+		Find(&reservations)
+	return reservations, result.Error
+}
+
 // TRANSACTIONS
 
 func (r *ReservationRepository) BeginTx() *gorm.DB {
 	return r.db.Begin()
+}
+
+func (r *ReservationRepository) CountOverlappingTx(tx *gorm.DB, resourceID uint, start, end time.Time) (int64, error) {
+	var count int64
+
+	result := tx.Model(&Reservation{}).
+		Where("resource_id =? AND NOT (end_time <= ? OR start_time >= ?)", resourceID, start, end).
+		Count(&count)
+
+	return count, result.Error
+}
+
+func (r *ReservationRepository) CreateTx(tx *gorm.DB, res *Reservation) error {
+	result := tx.Create(res)
+	return result.Error
 }
 
 // Optional: FindAvailableResources(from, to time.Time, capacity uint) ([]Resource, error)

@@ -1,38 +1,63 @@
 {{ define "content" }}
 <div class="card p-4">
-  <h2>Perfil de Usuario</h2>
-  <p><strong>Nombre:</strong> {{ .User.Name }}</p>
+  <h2>User Profile</h2>
+  <p><strong>Name:</strong> {{ .User.Name }}</p>
   <p><strong>Email:</strong> {{ .User.Email }}</p>
 
   <button class="btn btn-danger" hx-delete="/users/{{ .User.ID }}" hx-target="#content"
-    hx-confirm="¿Seguro que querés borrar este usuario?">
-    Borrar cuenta
+    hx-confirm="Are you sure you want to delete your account?">
+    Delete Account
   </button>
 </div>
+
 <hr />
 
 <div class="card p-4 mt-4">
-  <h3>Crear nueva reserva</h3>
+  <h3>Create New Reservation</h3>
 
-  <form id="reserva-form" hx-post="/reservas" hx-target="#reserva-respuesta" hx-swap="innerHTML">
+  <form id="reservation-form" hx-post="/reservations" hx-target="#reservation-list" hx-swap="beforeend"
+    hx-on="htmx:afterRequest: this.reset()">
+
     <div class="form-group">
-      <label for="fecha">Fecha</label>
-      <input type="date" id="fecha" name="fecha" class="form-control" required />
+      <label for="resource">Resource</label>
+      <select id="resource" name="resource_id" class="form-control" required>
+        {{ range .Resources }}
+        <option value="{{ .ID }}">{{ .Name }} ({{ .Type }})</option>
+        {{ end }}
+      </select>
     </div>
 
     <div class="form-group mt-2">
-      <label for="hora">Hora</label>
-      <input type="time" id="hora" name="hora" class="form-control" required />
+      <label for="start">Start time</label>
+      <input type="datetime-local" id="start" name="start" class="form-control" required />
     </div>
 
     <div class="form-group mt-2">
-      <label for="detalle">Detalle</label>
-      <input type="text" id="detalle" name="detalle" class="form-control" placeholder="Motivo o comentario..." />
+      <label for="end">End time</label>
+      <input type="datetime-local" id="end" name="end" class="form-control" required />
     </div>
 
-    <button type="submit" class="btn btn-primary mt-3">Crear reserva</button>
+    <button type="submit" class="btn btn-primary mt-3">Create Reservation</button>
   </form>
+</div>
 
-  <div id="reserva-respuesta" class="mt-3"></div>
+<hr />
+
+<div class="card p-4 mt-4">
+  <h3>Your Reservations</h3>
+  <ul id="reservation-list" class="list-group">
+    {{ if .Reservations }}
+    {{ range .Reservations }}
+    <li class="list-group-item" id="reservation-{{ .ID }}">
+      <strong>Resource:</strong> {{ .Resource.Name }} ({{ .Resource.Type }})<br>
+      <strong>Status:</strong> {{ .ReservationStatus }}<br>
+      <strong>Start:</strong> {{ .StartTime.Format "2006-01-02 15:04" }}<br>
+      <strong>End:</strong> {{ .EndTime.Format "2006-01-02 15:04" }}
+    </li>
+    {{ end }}
+    {{ else }}
+    <p>No reservations yet.</p>
+    {{ end }}
+  </ul>
 </div>
 {{ end }}

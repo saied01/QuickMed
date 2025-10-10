@@ -1,0 +1,8 @@
+{{ define "content" }}
+<div class="alert alert-success">
+  <strong>Reservation created successfully!</strong><br>
+  Resource: {{ .Reservation.ResourceID }}<br>
+  From: {{ .Reservation.StartTime }}<br>
+  To: {{ .Reservation.EndTime }}
+</div>
+{{ end }}

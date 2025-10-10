@@ -31,9 +31,8 @@ type Reservation struct {
 	Resource          Resource `gorm:"foreignKey:ResourceID"`
 	UserID            uint
 	User              uint `gorm:"foreignKey:UserID"`
-	DateTime          time.Time
+	StartTime         time.Time
 	EndTime           time.Time
 	ReservationStatus ReservationStatus `gorm:"type:varchar(20);not null"`
 	CreatedAt         time.Time
 }
-
